@@ -3,6 +3,8 @@
         "vector": "cpp",
         "string": "cpp",
         "xstring": "cpp",
-        "unordered_map": "cpp"
+        "unordered_map": "cpp",
+        "xmemory0": "c",
+        "threadpool.h": "c"
     }
 }
