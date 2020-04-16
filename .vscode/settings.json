@@ -3,6 +3,7 @@
         "vector": "cpp",
         "string": "cpp",
         "xstring": "cpp",
-        "unordered_map": "cpp"
+        "unordered_map": "cpp",
+        "sql_connection_pool.h": "c"
     }
 }
