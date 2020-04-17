@@ -25,16 +25,16 @@ Demo
 ----------
 > * 注册演示
 
-<div align=center><img src="https://github.com/ZWiley/TinyWebServer/blob/master/root/registernew.gif" height="429"/> </div>
+<div align=center><img src="https://github.com/ZWiley/TinyWebServer/blob/dev/root/registernew.gif" height="429"/> </div>
 > * 登录演示
 
-<div align=center><img src="https://github.com/ZWiley/TinyWebServer/blob/master/root/loginnew.gif" height="429"/> </div>
+<div align=center><img src="https://github.com/ZWiley/TinyWebServer/blob/dev/root/loginnew.gif" height="429"/> </div>
 > * 请求图片文件演示(6M)
 
-<div align=center><img src="https://github.com/ZWiley/TinyWebServer/blob/master/root/picture.gif" height="429"/> </div>
+<div align=center><img src="https://github.com/ZWiley/TinyWebServer/blob/dev/root/picture.gif" height="429"/> </div>
 > * 请求视频文件演示(39M)
 
-<div align=center><img src="https://github.com/ZWiley/TinyWebServer/blob/master/root/video.gif" height="429"/> </div>
+<div align=center><img src="https://github.com/ZWiley/TinyWebServer/blob/dev/root/video.gif" height="429"/> </div>
 
 测试结果
 -------------
@@ -47,12 +47,12 @@ Webbench对服务器进行压力测试，可以实现上万的并发连接.
 
 **注意：** 使用本项目的webbench进行压测时，若报错显示webbench命令找不到，将可执行文件webbench删除后，重新编译即可。
 
-<div align=center><img src="https://github.com/ZWiley/TinyWebServer/blob/master/root/testresult.png" height="201"/> </div>
+<div align=center><img src="https://github.com/ZWiley/TinyWebServer/blob/dev/root/testresult.png" height="201"/> </div>
 
 
 框架
 -------------
-<div align=center><img src="https://github.com/ZWiley/TinyWebServer/blob/master/root/frame.jpg" height="765"/> </div>
+<div align=center><img src="https://github.com/ZWiley/TinyWebServer/blob/dev/root/frame.jpg" height="765"/> </div>
 
 web端界面
 -------------
@@ -64,8 +64,8 @@ web端界面
 > * 登录失败提示
 
 
-<div align=center><img src="https://github.com/ZWiley/TinyWebServer/blob/master/interface/judge.jpg" height="200"/>         <img src="https://github.com/ZWiley/TinyWebServer/blob/master/interface/signup.jpg" height="200"/>         <img src="https://github.com/ZWiley/TinyWebServer/blob/master/interface/signupfail.jpg" height="200"/></div>
-<div align=center><img src="https://github.com/ZWiley/TinyWebServer/blob/master/interface/signin.jpg" height="200"/><img src="https://github.com/ZWiley/TinyWebServer/blob/master/interface/signinfail.jpg" height="200"/></div>
+<div align=center><img src="https://github.com/ZWiley/TinyWebServer/blob/dev/interface/judge.jpg" height="200"/>         <img src="https://github.com/ZWiley/TinyWebServer/blob/dev/interface/signup.jpg" height="200"/>         <img src="https://github.com/ZWiley/TinyWebServer/blob/dev/interface/signupfail.jpg" height="200"/></div>
+<div align=center><img src="https://github.com/ZWiley/TinyWebServer/blob/dev/interface/signin.jpg" height="200"/><img src="https://github.com/ZWiley/TinyWebServer/blob/dev/interface/signinfail.jpg" height="200"/></div>
 基础测试
 ------------
 * 服务器测试环境
