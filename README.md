@@ -99,7 +99,7 @@ web端界面
 * 修改http_conn.cpp中的root路径
 
     ```C++
-    const char* doc_root="/home/qgy/TinyWebServer/root";
+    const char* doc_root="/home/zwiley/TinyWebServer/root";
     ```
 
 * 生成server
