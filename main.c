@@ -26,7 +26,10 @@
 //#define ASYNLOG       //异步写日志
 
 //#define ET            //边缘触发非阻塞
+
 #define LT //水平触发阻塞
+#define LT              //水平触发阻塞
+
 
 //这三个函数在http_conn.cpp中定义，改变链接属性
 extern int addfd(int epollfd, int fd, bool one_shot);
@@ -164,7 +167,16 @@ int main(int argc, char *argv[])
     assert(epollfd != -1);
 
     addfd(epollfd, listenfd, false);
+#ifdef LT
+    addfd_(epollfd, listenfd, false);
+#endif
+
+#ifdef ET
+    addfd(epollfd, listenfd, false);
+#endif
+
     http_conn::m_epollfd = epollfd;
+
 
     //创建管道
     ret = socketpair(PF_UNIX, SOCK_STREAM, 0, pipefd);

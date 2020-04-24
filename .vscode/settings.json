@@ -4,9 +4,14 @@
         "string": "cpp",
         "xstring": "cpp",
         "unordered_map": "cpp",
+<<<<<<< HEAD
         "sql_connection_pool.h": "c",
         "system_error": "cpp",
         "xlocale": "cpp",
         "list": "cpp"
+=======
+        "xmemory0": "c",
+        "threadpool.h": "c"
+>>>>>>> master
     }
 }
