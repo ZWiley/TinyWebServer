@@ -2,14 +2,24 @@
 
 TinyWebServer
 ===============
-Linux下的简易web服务器，实现web端用户注册，登录功能,经压力测试可以实现上万的并发连接数据交换.详细参考《Linux服务器高性能编程》
+Linux下C++轻量级Web服务器，助力初学者快速实践网络编程，搭建属于自己的服务器.
+
+* 使用**线程池 + epoll(ET和LT均实现) + 模拟Proactor模式**并发模型
+* 使用**状态机**解析HTTP请求报文，支持解析**GET和POST**请求
+* 通过访问服务器数据库实现web端用户**注册、登录**功能，可以请求服务器**图片和视频文件**
+* 实现**同步/异步日志系统**，记录服务器运行状态
+* 经Webbench压力测试可以实现**上万的并发连接**数据交换
+
+模块概述
+----------
+
 > * C/C++
 > * B/S模型
 > * 线程同步机制包装类
 > * http连接请求处理类
 > * 半同步/半反应堆线程池
 > * 定时器处理非活动连接
-> * 同步/异步日志系统
+> * 同步/异步日志系统 
 > * 数据库连接池
 > * CGI及同步线程注册和登录校验
 > * 简易服务器压力测试
@@ -20,37 +30,44 @@ Update
 - [x] 增加请求视频文件的页面
 - [x] 解决数据库同步校验内存泄漏
 - [x] 实现两种CGI数据库访问逻辑
+- [x] 实现ET非阻塞和LT阻塞，并完成压力测试
+
 
 Demo
 ----------
 > * 注册演示
 
-<div align=center><img src="F:/SSE/面试/projects/TinyWebServer/root/registernew.gif" height="429"/> </div>
+<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0iz0dkleg30m80bxjyj.gif" height="429"/> </div>
 > * 登录演示
 
-<div align=center><img src="F:/SSE/面试/projects/TinyWebServer/root/loginnew.gif" height="429"/> </div>
+<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0izcc0r1g30m80bxn6a.gif" height="429"/> </div>
 > * 请求图片文件演示(6M)
 
-<div align=center><img src="F:/SSE/面试/projects/TinyWebServer/root/picture.gif" height="429"/> </div>
+<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0juxrnlfg30go07x4qr.gif" height="429"/> </div>
 > * 请求视频文件演示(39M)
 
-<div align=center><img src="F:/SSE/面试/projects/TinyWebServer/root/video.gif" height="429"/> </div>
-测试结果
+<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0jtxie8ng30go07xb2b.gif" height="429"/> </div>
+
+压力测试
 -------------
-Webbench对服务器进行压力测试，可以实现上万的并发连接.
+Webbench对服务器进行压力测试，在ET非阻塞和LT阻塞模式下均可实现上万的并发连接.
+
+> * ET非阻塞
+
+<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j0zgsr6j30fr05l74w.jpg" height="201"/> </div>
+> * LT阻塞
+
+<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j0qpch6j30ft05nq3k.jpg" height="201"/> </div>
 > * 并发连接总数：10500
 > * 访问服务器时间：5s
-> * 每秒钟响应请求数：552852 pages/min
-> * 每秒钟传输数据量：1031990 bytes/sec
 > * 所有访问均成功
 
 **注意：** 使用本项目的webbench进行压测时，若报错显示webbench命令找不到，将可执行文件webbench删除后，重新编译即可。
 
-<div align=center><img src="F:/SSE/面试/projects/TinyWebServer/root/testresult.png" height="201"/> </div>
 
 框架
 -------------
-<div align=center><img src="F:/SSE/面试/projects/TinyWebServer/root/frame.jpg" height="765"/> </div>
+<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j1atq5hj30g60lm0w4.jpg" height="765"/> </div>
 
 web端界面
 -------------
@@ -62,13 +79,18 @@ web端界面
 > * 登录失败提示
 
 
-<div align=center><img src="F:/SSE/面试/projects/TinyWebServer/interface/judge.jpg" height="200"/>         <img src="F:/SSE/面试/projects/TinyWebServer/interface/signup.jpg" height="200"/>         <img src="F:/SSE/面试/projects/TinyWebServer/interface/signupfail.jpg" height="200"/></div>
-<div align=center><img src="F:/SSE/面试/projects/TinyWebServer/interface/signin.jpg" height="200"/><img src="F:/SSE/面试/projects/TinyWebServer/interface/signinfail.jpg" height="200"/></div>
+<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j1qt5w7j306i06w746.jpg" height="200"/>         <img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j21iwi6j306306i3ye.jpg" height="200"/>         <img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j2b44jgj306v075q2w.jpg" height="200"/></div>
+<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j2r5rnfj306j06ewed.jpg" height="200"/><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j30o0wpj308n07cq2y.jpg" height="200"/></div>
 基础测试
 ------------
 * 服务器测试环境
 	* Ubuntu版本16.04
 	* MySQL版本5.7.29
+* 浏览器测试环境
+	* Windows、Linux均可
+	* Chrome
+	* FireFox
+	* 其他浏览器暂无测试
 
 * 测试前确认已安装MySQL数据库
 
@@ -214,6 +236,38 @@ web端界面
 	    make CGISQL.cgi
 	    ```
 
+* 选择任一**I/O复用方式**，代码中使用LT阻塞，可以修改为ET非阻塞.
+
+- [x] LT阻塞
+	* 关闭main.c中ET，打开LT
+	  
+	    ```C++
+	    28 //#define ET       //边缘触发非阻塞
+	    29 #define LT         //水平触发阻塞
+	    ```
+	
+	* 关闭http_conn.cpp中ET，打开LT
+	  
+	    ```C++
+	    16 //#define ET       //边缘触发非阻塞
+	    17 #define LT         //水平触发阻塞
+	    ```
+
+- [ ] ET非阻塞
+	* 关闭main.c中LT，打开ET
+	  
+	    ```C++
+	    28 #define ET         //边缘触发非阻塞
+	    29 //#define LT       //水平触发阻塞
+	    ```
+
+	* 关闭http_conn.cpp中LT，打开ET
+	  
+	    ```C++
+	    16 #define ET       //边缘触发非阻塞
+	    17 //#define LT         //水平触发阻塞
+	    ```
+
 * 选择任一**日志方式**，代码中使用同步日志，可以修改为异步写入.
 
 - [x] 同步写入日志
@@ -231,7 +285,7 @@ web端界面
 	    25 //#define SYNLOG //同步写日志
 	    26 #define ASYNLOG   /异步写日志
 	    ```
-* 选择数据库访问或日志写入方式后，按照前述生成server，启动server，即可进行测试.
+* 选择数据库访问、I/O复用方式或日志写入方式后，按照前述生成server，启动server，即可进行测试.
 
 致谢
 ------------
