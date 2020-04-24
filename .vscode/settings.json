@@ -4,6 +4,9 @@
         "string": "cpp",
         "xstring": "cpp",
         "unordered_map": "cpp",
-        "sql_connection_pool.h": "c"
+        "sql_connection_pool.h": "c",
+        "system_error": "cpp",
+        "xlocale": "cpp",
+        "list": "cpp"
     }
 }
