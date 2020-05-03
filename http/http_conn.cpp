@@ -129,8 +129,6 @@ void addfd(int epollfd, int fd, bool one_shot)
     event.events = EPOLLIN | EPOLLRDHUP;
 #endif
 
-    event.events = EPOLLIN | EPOLLLT | EPOLLRDHUP;
-
     if (one_shot)
         event.events |= EPOLLONESHOT;
     epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &event);
@@ -158,7 +156,6 @@ void modfd(int epollfd, int fd, int ev)
     event.events = ev | EPOLLONESHOT | EPOLLRDHUP;
 #endif
 
-    event.events = ev | EPOLLLT | EPOLLONESHOT | EPOLLRDHUP;
     epoll_ctl(epollfd, EPOLL_CTL_MOD, fd, &event);
 }
 
