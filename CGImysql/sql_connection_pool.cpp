@@ -10,17 +10,20 @@
 
 using namespace std;
 
-connection_pool *connection_pool::connPool = NULL;
-static pthread_mutex_t mutex;
-
-//初始化mutex
 connection_pool::connection_pool()
 {
-	pthread_mutex_init(&mutex, NULL);
+	this->CurConn = 0;
+	this->FreeConn = 0;
+}
+
+connection_pool *connection_pool::GetInstance()
+{
+	static connection_pool connPool;
+	return &connPool;
 }
 
 //构造初始化
-connection_pool::connection_pool(string url, string User, string PassWord, string DBName, int Port, unsigned int MaxConn)
+void connection_pool::init(string url, string User, string PassWord, string DBName, int Port, unsigned int MaxConn)
 {
 	this->url = url;
 	this->Port = Port;
@@ -28,7 +31,7 @@ connection_pool::connection_pool(string url, string User, string PassWord, strin
 	this->PassWord = PassWord;
 	this->DatabaseName = DBName;
 
-	pthread_mutex_lock(&lock);
+	lock.lock();
 	for (int i = 0; i < MaxConn; i++)
 	{
 		MYSQL *con = NULL;
@@ -50,70 +53,59 @@ connection_pool::connection_pool(string url, string User, string PassWord, strin
 		++FreeConn;
 	}
 
-	this->MaxConn = MaxConn;
-	this->CurConn = 0;
-	pthread_mutex_unlock(&lock);
+	reserve = sem(FreeConn);
+
+	this->MaxConn = FreeConn;
+	
+	lock.unlock();
 }
 
-//获得实例，只会有一个
-connection_pool *connection_pool::GetInstance(string url, string User, string PassWord, string DBName, int Port, unsigned int MaxConn)
-{
-	//先判断是否为空，若为空则创建，否则直接返回现有
-	if (connPool == NULL)
-	{
-		pthread_mutex_lock(&mutex);
-		if (connPool == NULL)
-		{
-			connPool = new connection_pool(url, User, PassWord, DBName, Port, MaxConn);
-		}
-		pthread_mutex_unlock(&mutex);
-	}
-	return connPool;
-}
 
 //当有请求时，从数据库连接池中返回一个可用连接，更新使用和空闲连接数
 MYSQL *connection_pool::GetConnection()
 {
 	MYSQL *con = NULL;
-	pthread_mutex_lock(&lock);
-	//reserve.wait();
-	if (connList.size() > 0)
-	{
-		con = connList.front();
-		connList.pop_front();
 
-		--FreeConn;
-		++CurConn;
+	if (0 == connList.size())
+		return NULL;
 
-		pthread_mutex_unlock(&lock);
-		return con;
-	}
-	pthread_mutex_unlock(&lock);
-	return NULL;
+	reserve.wait();
+	
+	lock.lock();
+
+	con = connList.front();
+	connList.pop_front();
+
+	--FreeConn;
+	++CurConn;
+
+	lock.unlock();
+	return con;
 }
 
 //释放当前使用的连接
 bool connection_pool::ReleaseConnection(MYSQL *con)
 {
-	pthread_mutex_lock(&lock);
-	if (con != NULL)
-	{
-		connList.push_back(con);
-		++FreeConn;
-		--CurConn;
+	if (NULL == con)
+		return false;
 
-		pthread_mutex_unlock(&lock);
-		//reserve.post();
-		return true;
-	}
-	pthread_mutex_unlock(&lock);
-	return false;
+	lock.lock();
+
+	connList.push_back(con);
+	++FreeConn;
+	--CurConn;
+
+	lock.unlock();
+
+	reserve.post();
+	return true;
 }
 
 //销毁数据库连接池
 void connection_pool::DestroyPool()
 {
-	pthread_mutex_lock(&lock);
+
+	lock.lock();
 	if (connList.size() > 0)
 	{
 		list<MYSQL *>::iterator it;
@@ -125,9 +117,11 @@ void connection_pool::DestroyPool()
 		CurConn = 0;
 		FreeConn = 0;
 		connList.clear();
-		pthread_mutex_unlock(&lock);
+
+		lock.unlock();
 	}
-	pthread_mutex_unlock(&lock);
+
+	lock.unlock();
 }
 
 //当前空闲的连接数
@@ -139,4 +133,15 @@ int connection_pool::GetFreeConn()
 connection_pool::~connection_pool()
 {
 	DestroyPool();
+}
+
+connectionRAII::connectionRAII(MYSQL **SQL, connection_pool *connPool){
+	*SQL = connPool->GetConnection();
+	
+	conRAII = *SQL;
+	poolRAII = connPool;
+}
+
+connectionRAII::~connectionRAII(){
+	poolRAII->ReleaseConnection(conRAII);
 }
