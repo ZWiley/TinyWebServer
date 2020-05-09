@@ -4,9 +4,9 @@ TinyWebServer
 ===============
 Linux下C++轻量级Web服务器，助力初学者快速实践网络编程，搭建属于自己的服务器.
 
-* 使用**线程池 + epoll(ET和LT均实现) + 模拟Proactor模式**并发模型
+* 使用**线程池 + epoll(ET和LT均实现) + 模拟Proactor模式**的并发模型
 * 使用**状态机**解析HTTP请求报文，支持解析**GET和POST**请求
-* 通过访问服务器数据库实现web端用户**注册、登录**功能，可以请求服务器**图片和视频文件**
+* 访问服务器数据库实现web端用户**注册、登录**功能，可以请求服务器**图片和视频文件**
 * 实现**同步/异步日志系统**，记录服务器运行状态
 * 经Webbench压力测试可以实现**上万的并发连接**数据交换
 
@@ -31,56 +31,15 @@ Update
 - [x] 解决数据库同步校验内存泄漏
 - [x] 实现两种CGI数据库访问逻辑
 - [x] 实现ET非阻塞和LT阻塞，并完成压力测试
+- [x] 完善`lock.h`中的封装类，统一使用该同步机制
+- [x] 改进代码结构，更新局部变量懒汉单例模式
+- [x] 优化数据库连接池信号量与代码结构
+- [x] 使用RAII机制优化数据库连接的获取与释放
+- [x] 优化代码结构，封装工具类以减少全局变量
+- [x] 编译一次即可，命令行进行个性化测试更加友好
+- [x] main函数封装重构
 
 
-Demo
-----------
-> * 注册演示
-
-<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0iz0dkleg30m80bxjyj.gif" height="429"/> </div>
-> * 登录演示
-
-<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0izcc0r1g30m80bxn6a.gif" height="429"/> </div>
-> * 请求图片文件演示(6M)
-
-<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0juxrnlfg30go07x4qr.gif" height="429"/> </div>
-> * 请求视频文件演示(39M)
-
-<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0jtxie8ng30go07xb2b.gif" height="429"/> </div>
-
-压力测试
--------------
-Webbench对服务器进行压力测试，在ET非阻塞和LT阻塞模式下均可实现上万的并发连接.
-
-> * ET非阻塞
-
-<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j0zgsr6j30fr05l74w.jpg" height="201"/> </div>
-> * LT阻塞
-
-<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j0qpch6j30ft05nq3k.jpg" height="201"/> </div>
-> * 并发连接总数：10500
-> * 访问服务器时间：5s
-> * 所有访问均成功
-
-**注意：** 使用本项目的webbench进行压测时，若报错显示webbench命令找不到，将可执行文件webbench删除后，重新编译即可。
-
-
-框架
--------------
-<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j1atq5hj30g60lm0w4.jpg" height="765"/> </div>
-
-web端界面
--------------
-
-> * 判断是否注册   
-> * 注册
-> * 注册失败提示
-> * 登录
-> * 登录失败提示
-
-
-<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j1qt5w7j306i06w746.jpg" height="200"/>         <img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j21iwi6j306306i3ye.jpg" height="200"/>         <img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j2b44jgj306v075q2w.jpg" height="200"/></div>
-<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j2r5rnfj306j06ewed.jpg" height="200"/><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j30o0wpj308n07cq2y.jpg" height="200"/></div>
 基础测试
 ------------
 * 服务器测试环境
@@ -95,31 +54,27 @@ web端界面
 * 测试前确认已安装MySQL数据库
 
     ```C++
-    //建立yourdb库
+    // 建立yourdb库
     create database yourdb set utf8;
 
-    //创建user表
+    // 创建user表
     USE yourdb;
     CREATE TABLE user(
         username char(50) NULL,
         passwd char(50) NULL
     )ENGINE=InnoDB;
 
-    //添加数据
+    // 添加数据
     INSERT INTO user(username, passwd) VALUES('name', 'passwd');
     ```
 
 * 修改main.c中的数据库初始化信息
 
     ```C++
-    //root root为服务器数据库的登录名和密码
-    connection_pool *connPool=connection_pool::GetInstance("localhost","root","root","yourdb",3306,5);
-    ```
-
-* 修改http_conn.cpp中的root路径
-
-    ```C++
-    const char* doc_root="/home/zwiley/TinyWebServer/root";
+    //数据库登录名,密码,库名
+    string user = "root";
+    string passwd = "root";
+    string databasename = "yourdb";
     ```
 
 * 生成server
@@ -131,161 +86,131 @@ web端界面
 * 启动server
 
     ```C++
-    ./server port
+    ./server
     ```
 
 * 浏览器端
 
     ```C++
-    ip:port
+    ip:9006
     ```
 
 个性化测试
 ------
-* 选择任一**校验方式**，代码中使用同步校验，可以修改为CGI.
 
-- [x] 同步线程数据库校验
-	* 关闭main.c中CGISQLPOOL，打开SYNSQL
+```C++
+./server [-p port] [-v SQLVerify] [-l LOGWrite] [-m TRIGMode] [-o OPT_LINGER] [-s sql_num] [-t thread_num]
+```
 
-	   ```C++
-		23 #define SYNSQL    //同步数据库校验
-		24 //#define CGISQLPOOL  //CGI数据库校验
-	   ```
+温馨提示:以上参数不是非必须，不用全部使用，根据个人情况搭配选用即可.
 
-	* 关闭http_conn.cpp中两种CGI，打开SYNSQL
-	  
-	    ```C++
-		7 //同步校验
-		8 #define SYNSQL
+* -p，自定义端口号
+	* 默认9006
+* -v，选择数据库校验方式，默认同步校验
+	* 0，同步校验，使用连接池
+	* 1，CGI校验，使用连接池
+	* 2，CGI校验，不使用连接池
+* -l，选择日志写入方式，默认同步写入
+	* 0，同步写入
+	* 1，异步写入
+* -m，epoll的触发模式，默认使用LT
+	* 0，表示使用LT
+	* 1，表示使用ET
+* -o，优雅关闭连接，默认不使用
+	* 0，不使用
+	* 1，使用
+* -s，数据库连接数量
+	* 默认为8
+* -t，线程数量
+	* 默认为8
 
-		10 //CGI多进程使用链接池
-		11 //#define CGISQLPOOL
+若使用CGI数据库校验方式，按如下编译代码，若使用同步校验，则跳过下面修改与生成CGI步骤.
 
-		13 //CGI多进程不用连接池
-		14 //#define CGISQL
-	    ```
+* 修改sign.cpp中的数据库初始化信息
 
-- [ ] CGI多进程数据库校验，不使用连接池
-	* 关闭main.c中SYNSQL和CGISQLPOOL
+    ```C++
+    // root root修改为服务器数据库的登录名和密码
+	// yourdb修改为上述创建的yourdb库名
+    con = mysql_real_connect(con, "localhost", "root", "root", "yourdb", 3306, NULL, 0);
+    ```
 
-	   ```C++
-		23 //#define SYNSQL    //同步数据库校验
-		24 //#define CGISQLPOOL  //CGI数据库校验
-	   ```
+* 生成CGISQL.cgi
 
-	* 关闭http_conn.cpp中SYNSQL和CGISQLPOOL，打开CGISQL
-	  
-	    ```C++
-		7 //同步校验
-		8 //#define SYNSQL
+    ```C++
+    make CGISQL.cgi
+    ```
 
-		10 //CGI多进程使用链接池
-		11 //#define CGISQLPOOL
+测试示例命令与含义
 
-		13 //CGI多进程不用连接池
-		14 #define CGISQL
-	    ```
-	
-	* 关闭sign.cpp中的CGISQLPOOL，打开CGISQL
+```C++
+./server -p 9007 -v 1 -l 1 -m 0 -o 1 -s 10 -t 10
+```
 
-	    ```C++
-	    12 #define CGISQL    //不使用连接池
-		13 //#define CGISQLPOOL  //使用连接池
-	    ```
-	* 修改sign.cpp中的数据库初始化信息
+- [x] 端口9007
+- [x] 同步数据库校验，使用连接池
+- [x] 异步写入日志
+- [x] 使用LT水平触发
+- [x] 使用优雅关闭连接
+- [x] 数据库连接池内有10条连接
+- [x] 线程池内有10条线程
 
-	    ```C++
-	    //root root为服务器数据库的登录名和密码
-	    connection_pool *connPool=connection_pool::GetInstance("localhost","root","root","yourdb",3306,5);
-	    ```
-	* 生成CGISQL.cgi
 
-	    ```C++
-	    make CGISQL.cgi
-	    ```
+Demo
+----------
+> * 注册演示
 
-- [ ] CGI多进程数据库校验，使用连接池
-	* 关闭main.c中SYNSQL，打开CGISQLPOOL
+<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0iz0dkleg30m80bxjyj.gif" height="429"/> </div>
 
-	   ```C++
-		23 //#define SYNSQL    //同步数据库校验
-		24 #define CGISQLPOOL  //CGI数据库校验
-	   ```
+> * 登录演示
 
-	* 关闭http_conn.cpp中SYNSQL和CGISQL，打开CGISQLPOOL
-	  
-	    ```C++
-		7 //同步校验
-		8 //#define SYNSQL
+<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0izcc0r1g30m80bxn6a.gif" height="429"/> </div>
 
-		10 //CGI多进程使用链接池
-		11 #define CGISQLPOOL
+> * 请求图片文件演示(6M)
 
-		13 //CGI多进程不用连接池
-		14 //#define CGISQL
-	    ```
-	* 关闭sign.cpp中的CGISQL，打开CGISQLPOOL
+<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0juxrnlfg30go07x4qr.gif" height="429"/> </div>
 
-	    ```C++
-	    12 //#define CGISQL    //不使用连接池
-		13 #define CGISQLPOOL  //使用连接池
-	    ```
-	* 生成CGISQL.cgi
+> * 请求视频文件演示(39M)
 
-	    ```C++
-	    make CGISQL.cgi
-	    ```
+<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0jtxie8ng30go07xb2b.gif" height="429"/> </div>
 
-* 选择任一**I/O复用方式**，代码中使用LT阻塞，可以修改为ET非阻塞.
 
-- [x] LT阻塞
-	* 关闭main.c中ET，打开LT
-	  
-	    ```C++
-	    28 //#define ET       //边缘触发非阻塞
-	    29 #define LT         //水平触发阻塞
-	    ```
-	
-	* 关闭http_conn.cpp中ET，打开LT
-	  
-	    ```C++
-	    16 //#define ET       //边缘触发非阻塞
-	    17 #define LT         //水平触发阻塞
-	    ```
+压力测试
+-------------
+Webbench对服务器进行压力测试，在ET非阻塞和LT阻塞模式下均可实现上万的并发连接. 这里以同步日志，不使用优雅关闭连接为例.
 
-- [ ] ET非阻塞
-	* 关闭main.c中LT，打开ET
-	  
-	    ```C++
-	    28 #define ET         //边缘触发非阻塞
-	    29 //#define LT       //水平触发阻塞
-	    ```
+> * ET非阻塞，18657 QPS
 
-	* 关闭http_conn.cpp中LT，打开ET
-	  
-	    ```C++
-	    16 #define ET       //边缘触发非阻塞
-	    17 //#define LT         //水平触发阻塞
-	    ```
+<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1gejjt9plmfj30fm05fgnt.jpg" height="201"/> </div>
 
-* 选择任一**日志方式**，代码中使用同步日志，可以修改为异步写入.
+> * LT阻塞，22868 QPS
 
-- [x] 同步写入日志
-	* 关闭main.c中ASYNLOG，打开同步写入SYNLOG
-	  
-	    ```C++
-	    25 #define SYNLOG //同步写日志
-	    26 //#define ASYNLOG   /异步写日志
-	    ```
+<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1gejjtn0judj30fj05htay.jpg" height="201"/> </div>
 
-- [ ] 异步写入日志
-	* 关闭main.c中SYNLOG，打开异步写入ASYNLOG
-	  
-	    ```C++
-	    25 //#define SYNLOG //同步写日志
-	    26 #define ASYNLOG   /异步写日志
-	    ```
-* 选择数据库访问、I/O复用方式或日志写入方式后，按照前述生成server，启动server，即可进行测试.
+> * 并发连接总数：10500
+> * 访问服务器时间：10s
+> * 所有访问均成功
+
+**注意：** 使用本项目的webbench进行压测时，若报错显示webbench命令找不到，将可执行文件webbench删除后，重新编译即可。
+
+
+框架
+-------------
+<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j1atq5hj30g60lm0w4.jpg" height="765"/> </div>
+
+
+web端界面
+-------------
+
+> * 判断是否注册   
+> * 注册
+> * 注册失败提示
+> * 登录
+> * 登录失败提示
+
+
+<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j1qt5w7j306i06w746.jpg" height="200"/>         <img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j21iwi6j306306i3ye.jpg" height="200"/>         <img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j2b44jgj306v075q2w.jpg" height="200"/></div>
+
+<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j2r5rnfj306j06ewed.jpg" height="200"/><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1ge0j30o0wpj308n07cq2y.jpg" height="200"/></div>
 
 致谢
 ------------
